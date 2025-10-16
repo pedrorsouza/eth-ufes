@@ -6,7 +6,6 @@ contract Variables {
     uint256 internal number2;
     uint256 private number3;
 
-   
     function setNumber(uint256 newNumber) public {
         number = newNumber;
     }
@@ -18,7 +17,6 @@ contract Variables {
     function setNumber3(uint256 newNumber) public {
         number3 = newNumber;
     }
-
 
     /*/////////////////////////
             internal 
@@ -71,6 +69,4 @@ contract Variables {
     function getAddress() public view returns (address) {
         return msg.sender;
     }
-
-
 }

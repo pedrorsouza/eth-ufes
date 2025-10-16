@@ -21,12 +21,12 @@ contract SafePiggy {
     // ✔️ mapping: chave -> valor (não iterável)
     // Guarda quanto cada endereço está autorizado a sacar via pull()
     mapping(address => uint256) public allowance;
-    
+
     // 🔒 Proteção contra reentrância
     // Estado que previne chamadas recursivas maliciosas
     bool private locked;
 
-        // ✔️ Eventos: facilitam auditoria e UX das dApps
+    // ✔️ Eventos: facilitam auditoria e UX das dApps
     event Deposited(address indexed from, uint256 amount);
     event AllowanceSet(address indexed who, uint256 amount);
     event Pulled(address indexed who, uint256 amount);
@@ -37,9 +37,9 @@ contract SafePiggy {
         if (msg.sender != owner) revert NotOwner();
         _;
     }
-    
+
     // 🔒 Modifier anti-reentrância: previne ataques de reentrância
-    // 
+    //
     // COMO FUNCIONA:
     // 1. locked = false (inicial)
     // 2. Função é chamada → locked = true
@@ -70,7 +70,7 @@ contract SafePiggy {
         owner = msg.sender;
     }
 
-        // ✔️ receive: aceita ETH enviado sem data (ex.: transfer/call simples)
+    // ✔️ receive: aceita ETH enviado sem data (ex.: transfer/call simples)
     // Atualiza nada além do log; o saldo do contrato muda automaticamente
     receive() external payable {
         if (msg.value == 0) revert ZeroAmount();
@@ -91,20 +91,20 @@ contract SafePiggy {
         emit Deposited(msg.sender, msg.value);
     }
 
-        // ✔️ Define a autorização (em wei) para um endereço sacar via pull()
+    // ✔️ Define a autorização (em wei) para um endereço sacar via pull()
     // ⚠️ ATENÇÃO: amount deve ser em wei (1 ETH = 1e18 wei)
     // 💡 IMPORTANTE: Allowance é INDEPENDENTE do depósito do usuário
     // O owner pode autorizar qualquer valor, mesmo que o usuário não tenha depositado
     function setAllowance(address who, uint256 amount) external onlyOwner {
-        allowance[who] = amount;     // storage: persiste na blockchain
+        allowance[who] = amount; // storage: persiste na blockchain
         emit AllowanceSet(who, amount);
     }
-    
+
     // ✔️ Função auxiliar para definir allowance em ETH (mais fácil de usar)
     // 💡 IMPORTANTE: Allowance é INDEPENDENTE do depósito do usuário
     // O owner pode autorizar qualquer valor, mesmo que o usuário não tenha depositado
     function setAllowanceInEth(address who, uint256 ethAmount) external onlyOwner {
-        allowance[who] = ethAmount * 1e18;  // Converte ETH para wei
+        allowance[who] = ethAmount * 1e18; // Converte ETH para wei
         emit AllowanceSet(who, allowance[who]);
     }
 
@@ -114,7 +114,7 @@ contract SafePiggy {
     function pull() external noReentrancy {
         uint256 amount = allowance[msg.sender];
         if (amount == 0) revert NotAllowed();
-        
+
         // Verificar se o contrato tem saldo suficiente
         if (address(this).balance < amount) revert NotAllowed();
 
@@ -123,33 +123,32 @@ contract SafePiggy {
 
         // Interactions: transferência de ETH (externa) no final
         // ⚠️ ATENÇÃO: Ainda vulnerável a reentrância se o receiver for um contrato malicioso
-        (bool ok, ) = payable(msg.sender).call{value: amount}("");
+        (bool ok,) = payable(msg.sender).call{value: amount}("");
         require(ok, "transfer failed");
 
         emit Pulled(msg.sender, amount);
     }
 
-    function pullAttack() external  {
+    function pullAttack() external {
         uint256 amount = allowance[msg.sender];
         if (amount == 0) revert NotAllowed();
-        
+
         // Verificar se o contrato tem saldo suficiente
         if (address(this).balance < amount) revert NotAllowed();
 
-
         // 🚨 VULNERÁVEL: Call externo ANTES de zerar o allowance
         // Isso permite reentrância porque o allowance ainda não foi zerado
-        (bool ok, ) = payable(msg.sender).call{value: amount}("");
+        (bool ok,) = payable(msg.sender).call{value: amount}("");
         require(ok, "transfer failed");
 
-         // 🚨 VULNERÁVEL: Zerar allowance DEPOIS da transferência
+        // 🚨 VULNERÁVEL: Zerar allowance DEPOIS da transferência
         // O atacante pode chamar pullAttack() novamente antes desta linha
         allowance[msg.sender] = 0;
 
         emit Pulled(msg.sender, amount);
     }
 
-         // ✔️ Função de leitura (view): não altera estado
+    // ✔️ Função de leitura (view): não altera estado
     function contractBalance() external view returns (uint256) {
         // address(this).balance lê o saldo em wei deste contrato
         return address(this).balance;

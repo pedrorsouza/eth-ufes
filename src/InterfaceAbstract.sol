@@ -18,7 +18,7 @@ abstract contract WalletBase is IWallet {
     // ✅ FORÇA filhos a implementar (não implementa aqui)
     // Obrigatório por: 1) Interface IWallet + 2) Abstract sem implementação
     function deposit() external payable virtual;
-    
+
     // ✅ FORÇA filhos a implementar (função adicional do abstract)
     function getBalance() external view virtual returns (uint256);
 }
@@ -27,7 +27,6 @@ abstract contract WalletBase is IWallet {
 contract SimpleWallet is WalletBase {
     event Deposited(address from, uint256 amount);
 
-    
     function deposit() external payable override {
         require(msg.value > 0, "zero");
         _bal += msg.value;
