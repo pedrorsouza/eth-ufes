@@ -2,9 +2,9 @@
 pragma solidity 0.8.26;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import {TimeLockVault} from "../src/projects/TimeLockVault.sol";
 
-contract CounterScript is Script {
+contract TimeLockVaultScript is Script {
     function setUp() public {}
 
     function run() external {
@@ -16,11 +16,13 @@ contract CounterScript is Script {
         
         vm.startBroadcast(deployerKey);
         
-        Counter counter = new Counter();
+        TimeLockVault timeLockVault = new TimeLockVault();
         
         vm.stopBroadcast();
 
-        console.log("Counter deployed at:", address(counter));
-        console.log("Initial number:", counter.number());
+        // Logs para verificação
+        console.log("TimeLockVault deployed at:", address(timeLockVault));
+        console.log("Min lock period:", timeLockVault.MIN_LOCK());
+        console.log("Contract balance:", address(timeLockVault).balance);
     }
 }

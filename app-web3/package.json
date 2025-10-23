@@ -1,0 +1,28 @@
+{
+  "name": "eth-ufes-web3",
+  "version": "1.0.0",
+  "description": "Projeto modular para interações com contratos Ethereum usando ethers.js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node examples/test-contracts.js"
+  },
+  "keywords": [
+    "ethereum",
+    "web3",
+    "ethers",
+    "smart-contracts",
+    "blockchain"
+  ],
+  "author": "ETH-UFES",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.8.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
